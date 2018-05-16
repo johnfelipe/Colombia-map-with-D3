@@ -11,6 +11,11 @@ var path = d3.geoPath()
     .projection(projection);
 
 
+var color = d3.scaleLinear() 
+    .domain([1, 20])
+    .range(['#fff', '#409A99']);
+
+    
 // Create SVG
 var svg             =   d3.select("#chart")
     .append("svg")
@@ -20,12 +25,19 @@ var svg             =   d3.select("#chart")
 //Data
 
 d3.json("colombia-dep.json").then(function(data){
+    var features = data.features;
+
+    // Update color scale domain based on data
+  color.domain([0, d3.max(features, nameLength)]);
+
+   
     svg.selectAll('path')
         .data(data.features)
         .enter()
         .append('path')
+        .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
-        .style('fill', "#116576")
+        .style('fill', fillFn)
         .on('mouseover', mouseover)
         .attr('d', path);
 })
@@ -39,3 +51,19 @@ function mouseover(d){
   }
 
 
+// Get province name
+function nameFn(d){
+    return d && d.properties ? d.properties.NOMBRE_DPT : null;
+  }
+
+
+ // Get province name length
+function nameLength(d){
+    var n = nameFn(d);
+    return n ? n.length : 0;
+  }
+
+  // Get province color
+function fillFn(d){
+    return color(nameLength(d));
+  }
