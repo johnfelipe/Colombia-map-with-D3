@@ -5,7 +5,7 @@ var centered;
 var color = d3.scaleLinear() 
     .domain([1, 20])
     .clamp(true)
-    .range(['#fff', '#409A99']);
+    .range(['white', '#409A99']);
 
 var projection = d3.geoMercator()
     .scale(12000/ 2 / Math.PI)
@@ -26,6 +26,7 @@ var svg = d3.select("#chart")
 svg.append('rect')
   .attr('class', 'background')
   .attr('width', chart_width)
+  .style('fill', '1135c2')
   .attr('height', chart_height)
 
 var g = svg.append('g');
@@ -58,7 +59,7 @@ d3.json("colombia-dep.json").then(function(data){
 
 function mouseover(d){
     // Highlight hovered province
-    d3.select(this).style('fill', '#00b2ff');
+    d3.select(this).style('fill', '0dd729');
   
   }
 
