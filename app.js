@@ -59,14 +59,15 @@ d3.json("colombia-dep.json").then(function(data){
 
 function mouseover(d){
     // Highlight hovered province
-    d3.select(this).style('fill', '0dd729');
+    d3.select(this).style('fill', '#20c997');
+
   
   }
 
 function mouseout(d){
     // Reset province color
     mapLayer.selectAll('path')
-      .style('fill', function(d){return centered && d===centered ? '#D5708B' : fillFn(d);});
+      .style('fill', function(d){return centered && d===centered ? '#20c997' : fillFn(d);});
   
   }
 
@@ -86,3 +87,75 @@ function nameLength(d){
 function fillFn(d){
     return color(nameLength(d));
   }
+
+
+
+
+  //canvas
+
+  var x = d3.scaleLinear()
+  .domain([-1, 1])
+  .range([20, 500]);
+
+  var steps = 5
+  //Discrete diverging scale
+  var color_threshold = d3.scaleThreshold()
+    .domain(d3.range(-1 + 2/steps, 1, 2/steps) ) //[-.6, -.2, .2, .6]
+    .range(d3.schemeGnBu[steps]); //=> 5 colors in an array
+
+  //Continuous diverging scale
+  var color_sequential = d3.scaleSequential(d3.interpolateGnBu)
+    .domain([-1, 1]);
+
+
+  function drawWithCanvas() {
+    //Cleanup
+    d3.select("#canvasExample").select("canvas").remove();
+    // Background canvas for quick drawing of 2k lines
+    var canvas = d3.select("#canvasExample").append("canvas")
+      .attr("width", 1500)
+      .attr("height", 100);
+    var ctx = canvas.node().getContext("2d");
+    //Translucent svg on top to show the axis
+    var svg = d3.select("#canvasExample").append("svg")
+      .attr("width", 1500)
+      .attr("height", 100)
+      .style("position", "absolute")
+      .style("top", 0)
+      .style("left", 0);
+
+    // Let's add an axis
+    svg.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0, 50)")
+      .call(d3.axisTop(x));
+
+    
+    d3.range(-1, 1, 0.0001)
+      .forEach(function (d) {
+        ctx.beginPath();
+        ctx.strokeStyle = color_threshold(d);
+        ctx.moveTo(x(d), 50);
+        ctx.lineTo(x(d), 70);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.strokeStyle = color_sequential(d);
+        ctx.moveTo(x(d), 80);
+        ctx.lineTo(x(d), 100);
+        ctx.stroke();
+      });
+  } // drawWithCanvas
+
+
+  // Setup button
+  d3.select("#btnCanvas").on("click", function () {
+
+    var t0 = performance.now();
+    drawWithCanvas();
+    var t1 = performance.now();
+    
+  } );
+ 
+
+  
